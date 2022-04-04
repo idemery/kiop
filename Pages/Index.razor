@@ -1,0 +1,241 @@
+﻿@page "/"
+
+<PageTitle>K3S Installer on Proxmox</PageTitle>
+
+@using kiop.Data
+@using kiop.Services
+@using Renci.SshNet
+@using System.Diagnostics
+
+@inject ProvisionerService provisioner
+
+
+<h1>Install K3S (A CNCF certified Kubernetes distribution by Rancher) on Proxmox</h1>
+<style>
+    #flexCheckScroll {
+        width: 25px;
+        padding: 0;
+        margin: 0px 5px 0px 0px;
+        height: 25px;
+    }
+
+    #consolewindow {
+        overflow-y: scroll;
+        overflow-x: auto;
+        background-color: black;
+        color: lawngreen;
+        font-family: Courier;
+        height: 100%;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+        input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+</style>
+
+<div>
+
+    <div class="row">
+        <EditForm Model="@kubeProperties" OnValidSubmit="@Submit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="row">
+                <div class="col-6">
+                    <p>
+                        <label>
+                            Image Url:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.ImageUrl" />
+                    </p>
+                    <p>
+                        <label>
+                            Host IP Address:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.HostAddress" />
+                    </p>
+                    <p>
+                        <label>
+                            Host Username:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.HostUsername" />
+                    </p>
+                    <p>
+                        <label>
+                            Host Password:
+                        </label>
+                        <InputText type="password" @bind-Value="kubeProperties.HostPassword" />
+                    </p>
+                    <p>
+                        <label>
+                            Host Target Node:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.HostTargetNode" />
+                    </p>
+                    <p>
+                        <label>
+                            Host Target Storage:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.HostTargetStorage" />
+                    </p>
+
+
+                    <p>
+                        <label>
+                            VMs Admin Username:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.AdminUser" />
+                    </p>
+                    <p>
+                        <label>
+                            VMs Admin Password:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.AdminPassword" />
+                    </p>
+                </div>
+                <div class="col-6">
+                    <p>
+                        <label>
+                            VM Template Id (optional):
+                        </label>
+                        <InputText @bind-Value="kubeProperties.TemplateId" />
+                    </p>
+
+                    <p>
+                        <label>
+                            Gateway IP Address:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.GatewayIp" />
+                    </p>
+
+                    <p>
+                        <label>
+                            Cluster Virtual IP Address:
+                        </label>
+                        <InputText @bind-Value="kubeProperties.ClusterApiVip" />
+                    </p>
+
+                    <p>
+                        <label>
+                            Master nodes IPs (3 at least, example: x.x.x.1, x.x.x.2, x.x.x.3):
+                        </label>
+                        <InputText @bind-Value="kubeProperties.MasterIPs" />
+                    </p>
+                    <p>
+                        <label>
+                            Master disk size (GBs):
+                        </label>
+                        <InputNumber @bind-Value="kubeProperties.MasterDiskSize" />
+                    </p>
+                    <p>
+                        <label>
+                            Worker nodes IPs (2 at least, example: x.x.x.4, x.x.x.5):
+                        </label>
+                        <InputText @bind-Value="kubeProperties.WorkerIPs" />
+                    </p>
+                    <p>
+                        <label>
+                            Worker disk size (GBs):
+                        </label>
+                        <InputNumber @bind-Value="kubeProperties.WorkerDiskSize" />
+                    </p>
+                    <p>
+                        <label>
+                            Load Balancer IP Range (example: x.x.x.100-x.x.x.199):
+                        </label>
+                        <InputText @bind-Value="kubeProperties.LoadBalancerVipsRange" />
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <button type="submit" class="btn btn-lg btn-success">Submit</button>
+            </div>
+
+        </EditForm>
+    </div>
+
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="flexCheckScroll">
+        <label class="form-check-label" for="flexCheckScroll">
+            Auto scroll
+        </label>
+    </div>
+
+    <div style="height:400px">
+        <div id="consolewindow" class="mh-100 mw-100">
+            @((MarkupString)result)
+        </div>
+    </div>
+
+
+</div>
+
+@code {
+
+    string? result = string.Empty;
+    private ProvisionerData kubeProperties = new()
+        {
+            ImageUrl = "https://cloud-images.ubuntu.com/minimal/releases/focal/release/ubuntu-20.04-minimal-cloudimg-amd64.img",
+            AdminPassword = "someP@ssw0rd",
+            AdminUser = "serveradmin",
+            ClusterApiVip = "192.168.1.72",
+            GatewayIp = "192.168.1.1",
+            HostAddress = "192.168.1.23",
+            HostTargetNode = "pve",
+            HostTargetStorage = "local-lvm",
+            HostUsername = "root",
+            LoadBalancerVipsRange = "192.168.1.78-192.168.1.79",
+            MasterIPs = "192.168.1.73,192.168.1.74,192.168.1.75",
+            MasterDiskSize = 5,
+            WorkerIPs = "192.168.1.76,192.168.1.77",
+            WorkerDiskSize = 10,
+            TemplateId = "7001"
+
+        };
+
+    private async Task Submit()
+    {
+
+        await provisioner.ExecuteAsync(kubeProperties, AnsibleOutputHandler, SshOutputHandler);
+
+    }
+
+    private void AnsibleOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
+    {
+        WriteToConsole(outLine.Data);
+    }
+
+    private void SshOutputHandler(ScriptOutputLine obj)
+    {
+        WriteToConsole(obj.Line);
+    }
+
+    private void WriteToConsole(string data)
+    {
+        Console.WriteLine(data);
+        result += $"<div>{data}</div>";
+
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}
