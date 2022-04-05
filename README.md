@@ -9,6 +9,8 @@ Example:
 
 Open your browser on http://localhost:8080 and fill in the information then click submit. Wait and watch the console screen on bottom.
 
+![kiop](https://github.com/idemery/kiop/blob/master/Screen%20Shot%202022-04-05%20at%201.52.03%20PM.png)
+
 # How it works
 By mapping your ssh key folder to this container (notice the read only :ro ), this application does the following in order: 
 
