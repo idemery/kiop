@@ -11,13 +11,14 @@ Open your browser on http://localhost:8080 and fill in the information then clic
 
 # How it works
 By mapping your ssh key folder to this container (notice the read only :ro ), this application does the following in order: 
-1- Connects to your ProxMox server using SSH session with IP, username and password
-2- Downloads a linux cloud image (suggested is ubuntu focal minimal image)
-3- Uploads your ssh key to the ProxMox server
-4- Creates virtual machine template based on the cloud image and sets the ssh key cloud-init parameter to your ssh key
-5- Creates master and worker nodes by cloning the template based on the count of master and worker IPs entered and sets the network configuration and disk size using cloud-init parameters
-6- Copies and configures ansible/inventory/sample/hosts.ini and ansible/inventory/sample/group_vars/all.yml into my-cluster folder 
-7- Executes ansible-playbook process
+
+1. Connects to your ProxMox server using SSH session with IP, username and password
+2. Downloads a linux cloud image (suggested is ubuntu focal minimal cloud image)
+3. Uploads your public ssh key to the ProxMox server
+4. Creates virtual machine template based on the cloud image and sets the ssh key cloud-init parameter to your ssh key
+5. Creates master and worker nodes by cloning the template based on the count of master and worker IPs entered and sets the network configuration and disk size using cloud-init parameters
+6. Copies and configures ansible/inventory/sample/hosts.ini and ansible/inventory/sample/group_vars/all.yml into my-cluster folder 
+7. Executes ansible-playbook process
 
 # Notes
 - Used .NET Core 6:latest docker image because its based on debian which is easy to install ansible on (thanks to geerlingguy's repo mentioned below)
