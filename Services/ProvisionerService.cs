@@ -38,7 +38,10 @@ namespace kiop.Services
                 await sshService.ExecuteAsync($"wget {kubeProperties.ImageUrl}");
                 
                 await sshService.ExecuteAsync($"qm create {kubeProperties.TemplateId} --memory 4096 --cores 4  --name ubuntu-cloud-{kubeProperties.TemplateId} --net0 virtio,bridge=vmbr0");
-                await sshService.ExecuteAsync($"qm importdisk {kubeProperties.TemplateId} focal-server-cloudimg-amd64.img {kubeProperties.HostTargetStorage}");
+
+                string imageFileName = kubeProperties.ImageUrl.Split('/').Last();
+
+                await sshService.ExecuteAsync($"qm importdisk {kubeProperties.TemplateId} {imageFileName} {kubeProperties.HostTargetStorage}");
                 await sshService.ExecuteAsync($"qm set {kubeProperties.TemplateId} --scsihw virtio-scsi-pci --scsi0 {kubeProperties.HostTargetStorage}:vm-{kubeProperties.TemplateId}-disk-0");
                 await sshService.ExecuteAsync($"qm set {kubeProperties.TemplateId} --ide2 {kubeProperties.HostTargetStorage}:cloudinit");
                 await sshService.ExecuteAsync($"qm set {kubeProperties.TemplateId} --boot c --bootdisk scsi0");
