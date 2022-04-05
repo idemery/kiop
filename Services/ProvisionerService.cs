@@ -15,17 +15,20 @@ namespace kiop.Services
                 string.IsNullOrWhiteSpace(kubeProperties.HostPassword) ||
                 string.IsNullOrWhiteSpace(kubeProperties.HostTargetNode) ||
                 string.IsNullOrWhiteSpace(kubeProperties.HostTargetStorage) ||
-                string.IsNullOrWhiteSpace(kubeProperties.TemplateId) ||
                 string.IsNullOrWhiteSpace(kubeProperties.AdminUser) ||
                 string.IsNullOrWhiteSpace(kubeProperties.AdminPassword) ||
                 string.IsNullOrWhiteSpace(kubeProperties.ClusterApiVip) ||
                 string.IsNullOrWhiteSpace(kubeProperties.MasterIPs) ||
-                string.IsNullOrWhiteSpace(kubeProperties.WorkerIPs))
+                string.IsNullOrWhiteSpace(kubeProperties.WorkerIPs) ||
+                kubeProperties.TemplateId < 1 ||
+                kubeProperties.MasterDiskSize < 3 ||
+                kubeProperties.WorkerDiskSize < 3)
             {
+                sshOutputHandler(new ScriptOutputLine("Wrong or incomplete information.", true));
                 return;
             }
 
-            sshOutputHandler(new ScriptOutputLine("Starting the provisioner..", false));
+            sshOutputHandler(new ScriptOutputLine("Starting the provisioner..", true));
             
             string[] masterNodes = kubeProperties.MasterIPs.Split(',');
             string[] workerNodes = kubeProperties.WorkerIPs.Split(',');
@@ -52,7 +55,7 @@ namespace kiop.Services
 
                 for (int i = 0; i < masterNodes.Length; i++)
                 {
-                    int id = 300 + i;
+                    int id = kubeProperties.TemplateId + 1 + i;
 
                     await sshService.ExecuteAsync($"qm clone {kubeProperties.TemplateId} {id} --name k3s-master-{id} --full --storage {kubeProperties.HostTargetStorage} --target {kubeProperties.HostTargetNode}");
                     await sshService.ExecuteAsync($"qm set {id} --ipconfig0 ip={masterNodes[i]}/24,gw={kubeProperties.GatewayIp}");
@@ -62,7 +65,7 @@ namespace kiop.Services
 
                 for (int i = 0; i < workerNodes.Length; i++)
                 {
-                    int id = 400 + i;
+                    int id = kubeProperties.TemplateId + 1 + masterNodes.Length + i;
 
                     await sshService.ExecuteAsync($"qm clone {kubeProperties.TemplateId} {id} --name k3s-worker-{id} --full --storage {kubeProperties.HostTargetStorage} --target {kubeProperties.HostTargetNode}");
                     await sshService.ExecuteAsync($"qm set {id} --ipconfig0 ip={workerNodes[i]}/24,gw={kubeProperties.GatewayIp}");

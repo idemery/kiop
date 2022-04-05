@@ -23,8 +23,8 @@ namespace kiop.Data
         public string? AdminUser { get; set; }
         [Required]
         public string? AdminPassword { get; set; }
-
-        public string? TemplateId { get; set; }
+        [Required]
+        public int TemplateId { get; set; }
 
         [Required]
         [RegularExpression("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", ErrorMessage = "Must be in IP format xxx.xxx.xxx.xxx")]

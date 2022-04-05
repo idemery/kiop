@@ -26,6 +26,8 @@
         color: lawngreen;
         font-family: Courier;
         height: 100%;
+        height:400px;
+        margin-top: 10px;
     }
 
     input {
@@ -106,7 +108,7 @@
                     </p>
                     <p>
                         <label>
-                            VMs Admin Password:
+                            VMs Admin Password (also used as the k3s_token):
                         </label>
                         <InputText @bind-Value="kubeProperties.AdminPassword" />
                     </p>
@@ -114,9 +116,9 @@
                 <div class="col-6">
                     <p>
                         <label>
-                            VM Template Id (optional):
+                            VM Template Id:
                         </label>
-                        <InputText @bind-Value="kubeProperties.TemplateId" />
+                        <InputNumber @bind-Value="kubeProperties.TemplateId" />
                     </p>
 
                     <p>
@@ -169,24 +171,26 @@
                 <button type="submit" class="btn btn-lg btn-success">Submit</button>
             </div>
 
+
         </EditForm>
     </div>
 
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="" id="flexCheckScroll">
-        <label class="form-check-label" for="flexCheckScroll">
-            Auto scroll
-        </label>
-    </div>
 
-    <div style="height:400px">
-        <div id="consolewindow" class="mh-100 mw-100">
-            @((MarkupString)result)
-        </div>
-    </div>
+
 
 
 </div>
+    <div style="margin:10px">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="flexCheckScroll">
+            <label class="form-check-label" for="flexCheckScroll">
+                Auto scroll
+            </label>
+        </div>
+        <div id="consolewindow"class="mw-100">
+            @((MarkupString)result)
+        </div>
+    </div>
 
 @code {
 
@@ -207,7 +211,7 @@
             MasterDiskSize = 5,
             WorkerIPs = "192.168.1.76,192.168.1.77",
             WorkerDiskSize = 10,
-            TemplateId = "7001"
+            TemplateId = 6999
 
         };
 
