@@ -123,6 +123,13 @@
 
                     <p>
                         <label>
+                            Linux Bridge:
+                        </label>
+                        <InputNumber @bind-Value="kubeProperties.Bridge" />
+                    </p>
+
+                    <p>
+                        <label>
                             Gateway IP Address:
                         </label>
                         <InputText @bind-Value="kubeProperties.GatewayIp" />
@@ -211,7 +218,8 @@
             MasterDiskSize = 5,
             WorkerIPs = "192.168.1.76,192.168.1.77",
             WorkerDiskSize = 10,
-            TemplateId = 7000
+            TemplateId = 7000,
+            Bridge = "vmbr0"
 
         };
 

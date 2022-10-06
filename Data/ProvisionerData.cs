@@ -30,6 +30,8 @@ namespace kiop.Data
         [RegularExpression("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", ErrorMessage = "Must be in IP format xxx.xxx.xxx.xxx")]
         public string? GatewayIp { get; set; }
 
+        public string? Bridge { get; set; }
+
         [Required]
         [RegularExpression("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", ErrorMessage = "Must be in IP format xxx.xxx.xxx.xxx")]
         public string? ClusterApiVip { get; set; }

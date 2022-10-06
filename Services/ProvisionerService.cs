@@ -37,7 +37,7 @@ namespace kiop.Services
             {
                 await sshService.ExecuteAsync($"wget {kubeProperties.ImageUrl}");
                 
-                await sshService.ExecuteAsync($"qm create {kubeProperties.TemplateId} --memory 4096 --cores 4  --name ubuntu-cloud-{kubeProperties.TemplateId} --net0 virtio,bridge=vmbr0");
+                await sshService.ExecuteAsync($"qm create {kubeProperties.TemplateId} --memory 4096 --cores 4  --name ubuntu-cloud-{kubeProperties.TemplateId} --net0 virtio,bridge={kubeProperties.Bridge ?? "vmbr0"}");
 
                 string imageFileName = kubeProperties.ImageUrl.Split('/').Last();
 
